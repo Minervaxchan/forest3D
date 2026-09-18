@@ -18,3 +18,8 @@ build/
 
 # Logs
 *.log
+
+# Local validation artifacts
+*.tsbuildinfo
+test-results/
+playwright-report/

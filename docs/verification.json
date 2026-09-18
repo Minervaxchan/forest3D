@@ -1,0 +1,46 @@
+[
+  {
+    "viewport": "1440x900",
+    "checks": [
+      "entry",
+      "audio unlocked",
+      "wave and jump branches, animation lock and idle return",
+      "random blink",
+      "master gain fade out/in",
+      "lights",
+      "music toggle",
+      "parallax",
+      "night lazy-load and round trip",
+      "background pause and resume",
+      "no horizontal overflow",
+      "no console errors"
+    ],
+    "passed": true
+  },
+  {
+    "viewport": "390x844",
+    "checks": [
+      "entry",
+      "audio unlocked",
+      "wave and jump branches, animation lock and idle return",
+      "random blink",
+      "master gain fade out/in",
+      "lights",
+      "music toggle",
+      "parallax",
+      "night lazy-load and round trip",
+      "background pause and resume",
+      "no horizontal overflow",
+      "no console errors"
+    ],
+    "passed": true
+  },
+  {
+    "reducedMotion": true,
+    "passed": true
+  },
+  {
+    "sceneLoadFailureAndRetry": true,
+    "passed": true
+  }
+]

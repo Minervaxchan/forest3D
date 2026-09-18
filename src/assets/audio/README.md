@@ -1,0 +1,1 @@
+V0.1 BGM is an original procedural Web Audio pad. Supply licensed files under public/assets/audio and set SceneConfig.bgm.src. Ambient loops use SceneConfig.ambient = {src, volume}.
