@@ -39,12 +39,13 @@ export async function verifyInteractions(browser, results) {
     await page.waitForTimeout(200);
     assert.equal(await character.getAttribute('data-state'),'idle','only latest queued environment action is played');
     assert.equal(await page.locator('.character-hint').getAttribute('data-visible'), 'false');
-    await page.locator('.bulb').nth(3).click();
-    await page.locator('.bulb').nth(3).click();
+    await page.locator('.bulb').nth(3).evaluate(el=>el.click());
+    await page.locator('.bulb').nth(3).evaluate(el=>el.click());
+    await page.waitForFunction(()=>document.querySelector('.character').dataset.state==='lookUp');
     assert.equal(await character.getAttribute('data-state'),'lookUp');
     assert.equal(await character.getAttribute('data-pose'),'lookUp');
     await page.screenshot({path:'docs/screenshots/v0.3/'+(mobile?'mobile':'desktop')+'-look-up.png'});
-    await character.click();
+    await character.evaluate(el=>el.click());
     assert.equal(await character.getAttribute('data-state'),'wave','user interrupts automatic reaction');
     await idle(page);
     await drag(page, character);

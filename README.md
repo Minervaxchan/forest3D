@@ -4,6 +4,8 @@ V0.3：移动端优先的 2.5D 可玩 H5。轻触蘑菇会发光，溪流会泛�
 
 ## 运行
 
+在线体验：https://minervaxchan.github.io/forest3D/ 。发布流程见 [DEPLOYMENT.md](docs/DEPLOYMENT.md)。
+
 ```sh
 npm install
 npm run dev
