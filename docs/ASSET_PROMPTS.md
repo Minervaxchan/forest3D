@@ -42,3 +42,17 @@ Use case: precise-object-edit. Edit this exact transparent character sprite into
 Use case: precise-object-edit. Create a raised-hand greeting animation frame of this EXACT transparent yellow plush creature sprite. Preserve its exact three uneven flame-shaped head lobes, big blue oval eyes with white rims and lashes, pink cheeks, small black curved smile, yellow plush texture, front-facing body and white shoes. Change ONLY its arm on the VIEWER'S RIGHT: raise and bend that arm so the little open rounded hand is beside the head, palm facing us, cheerful waving pose. Viewer-left arm stays down. Do not raise both arms. Keep head/torso/eyes/feet geometry and lighting identical to reference, centered torso, full body, same shoe baseline. Square 1024x1024 actual transparent alpha background, no floor, no text. Leave space so raised hand is not cropped. This is an animation sprite frame, not a redesign.
 
 V0.2 已替换上文 V0.1 的 CSS 眼睑和原姿态摇摆方案；依然没有骨骼动画。BGM 与环境声均为程序合成，无外部授权音乐/录音。
+
+## V0.3 抬头帧 → src/assets/character/friend-look-up-source.png
+
+来源：内置 imagegen，参考当前 idle 角色；项目用户提供原始角色参考。生成源图保留，压缩为 public/assets/character/friend-look-up.webp（640×640）。生成图仍待统一美术评审，原始参考的公开使用权限由项目负责人确认。
+
+Use case: precise-object-edit. Create a LOOK UP reaction frame of this exact yellow plush character sprite. Keep same square composition, exact body silhouette, three uneven flame-shaped lobes, plush material, pink cheeks, tiny smile, both hands at sides, legs and white shoes. Change ONLY eye gaze: tilt the large blue oval eyes upward toward lights above its head, with pupils/blue centers looking upward and a little more white visible beneath. Subtle curious expression, not surprised or frightened. Do not move feet, change body shape, shrink character, add props or alter head lobes. Same centered full-body framing and baseline as source. Actual transparent alpha background. No text or backdrop, square 1024x1024.
+
+## V0.3 蘑菇 → src/assets/scenes/mushrooms-source.png
+
+来源：内置 imagegen，独立生成透明素材，无外部素材网站资源。压缩为 public/assets/scenes/mushrooms.webp（480×480），光晕运行时生成。蘑菇图与按钮共用移动定位。
+
+A production transparent PNG sprite for a photorealistic cozy magical forest H5. A small close cluster of TWO woodland toadstool mushrooms, one taller and one shorter, warm terracotta-red domed caps with a few tiny creamy flecks, creamy stems, subtle translucency under caps, and a very small tuft of moss at the base. Realistic detailed textures, soft natural light from upper right, front three-quarter view slightly from above, compatible with a cinematic oak forest floor. Full cluster centered in a square 1024x1024 image, compact silhouette, clear edges, modest size difference, no wide ground plane, NO floor shadow outside sprite, no other plants, no characters, no text, no glow baked beyond the silhouette. Actual transparent alpha background, not a checkerboard painted in.
+
+V0.3 的 listen 暂复用闭眼帧；所有声音仍为项目代码内的程序合成，无第三方录音授权依赖。正式美术与音频替换按 ROADMAP.md 的 V0.4/V0.5 执行。

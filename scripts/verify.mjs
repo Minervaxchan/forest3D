@@ -1,7 +1,8 @@
 import {chromium} from '@playwright/test';
+import {verifyInteractions} from './verify-interactions.mjs';
 import assert from 'node:assert/strict';
 import {mkdir,writeFile} from 'node:fs/promises';
-await mkdir('docs/screenshots/v0.2',{recursive:true});
+await mkdir('docs/screenshots/v0.3',{recursive:true});
 const browser=await chromium.launch({channel:process.env.BROWSER_CHANNEL||'msedge',headless:true});
 const results=[];
 try{
@@ -21,7 +22,7 @@ for(const mobile of [false,true]){
  await page.goto(process.env.TEST_BASE_URL||'http://localhost:5186',{waitUntil:'networkidle'});
  assert(!requests.some(url=>url.includes('night-reference')), 'night image should be lazy');
  assert.equal(await page.title(), 'forest3D · 林间来信', 'test URL must point to forest3D');
- await page.screenshot({path:'docs/screenshots/v0.2/'+(mobile?'mobile':'desktop')+'-opening.png'});
+ await page.screenshot({path:'docs/screenshots/v0.3/'+(mobile?'mobile':'desktop')+'-opening.png'});
  await page.getByRole('button',{name:'点击进入森林'}).click();
  await page.waitForTimeout(1300);
  assert.equal(await page.evaluate(()=>window.__contexts[0].state),'running');
@@ -42,7 +43,7 @@ for(const mobile of [false,true]){
   if(expected==='wave'){
    assert.equal(await character.getAttribute('data-pose'),'wave');
    assert.equal(await page.locator('.pose-wave').evaluate(img=>img.complete&&img.naturalWidth>0),true);
-   await page.screenshot({path:'docs/screenshots/v0.2/'+(mobile?'mobile':'desktop')+'-wave.png'});
+   await page.screenshot({path:'docs/screenshots/v0.3/'+(mobile?'mobile':'desktop')+'-wave.png'});
   }else{
    await page.waitForTimeout(300);
    const opacity=await page.locator('.character-shadow').evaluate(el=>Number(getComputedStyle(el).opacity));
@@ -51,7 +52,7 @@ for(const mobile of [false,true]){
   await page.waitForTimeout(1600);assert.equal(await character.getAttribute('data-state'),'idle');
  }
  await page.waitForFunction(()=>document.querySelector('.character')?.getAttribute('data-pose') === 'blink',{},{timeout:7000});
- await page.screenshot({path:'docs/screenshots/v0.2/'+(mobile?'mobile':'desktop')+'-blink.png'});
+ await page.screenshot({path:'docs/screenshots/v0.3/'+(mobile?'mobile':'desktop')+'-blink.png'});
  const light=page.getByRole('button',{name:'灯串熄灭，灯泡 4'});
  await light.click();
  assert.equal(await page.getByRole('button',{name:'灯串点亮，灯泡 4'}).getAttribute('aria-pressed'),'false');
@@ -73,13 +74,15 @@ for(const mobile of [false,true]){
  await page.waitForTimeout(700);
  assert(Math.abs(await page.locator('main').evaluate(el=>Number(el.style.getPropertyValue('--px'))))>.2,'parallax should respond');
  assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no horizontal overflow');
- await page.screenshot({path:'docs/screenshots/v0.2/'+(mobile?'mobile':'desktop')+'-forest.png'});
+ await page.screenshot({path:'docs/screenshots/v0.3/'+(mobile?'mobile':'desktop')+'-forest.png'});
  await page.getByRole('button',{name:'切换至萤火之森'}).click();
  await page.getByRole('heading',{name:'萤火之森'}).waitFor();
  await page.waitForTimeout(1550);
+ assert.equal(await page.locator('main').evaluate(el=>el.scrollLeft),0,'focus must not horizontally scroll scene');
+ assert.equal(await page.locator('.header').evaluate(el=>Math.round(el.getBoundingClientRect().left)),0,'header remains within viewport after transition');
  assert.equal(await page.evaluate(()=>window.__contexts[0].__loops.size),2,'old scene loops must be released after crossfade');
  assert(requests.some(url=>url.includes('night-reference')));
- await page.screenshot({path:'docs/screenshots/v0.2/'+(mobile?'mobile':'desktop')+'-night.png'});
+ await page.screenshot({path:'docs/screenshots/v0.3/'+(mobile?'mobile':'desktop')+'-night.png'});
  await page.getByRole('button',{name:'切换至日光森林'}).click();
  await page.getByRole('heading',{name:'日光森林'}).waitFor();
  await page.waitForTimeout(1300);
@@ -115,6 +118,7 @@ await failurePage.unroute('**/night-reference.webp');
 await failurePage.getByRole('button',{name:'切换至萤火之森'}).click();
 await failurePage.getByRole('heading',{name:'萤火之森'}).waitFor();
 results.push({sceneLoadFailureAndRetry:true,passed:true});
-await writeFile('docs/verification-v0.2.json',JSON.stringify(results,null,2));
+await verifyInteractions(browser, results);
+await writeFile('docs/verification-v0.3.json',JSON.stringify(results,null,2));
 console.log(JSON.stringify(results,null,2));
 }finally{await browser.close();}

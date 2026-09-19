@@ -1,0 +1,98 @@
+[
+  {
+    "viewport": "1440x900",
+    "checks": [
+      "entry",
+      "audio unlocked",
+      "wave and jump branches, animation lock and idle return",
+      "aligned blink/wave sprite frames",
+      "jump contact shadow",
+      "audible music and ambience signal",
+      "old scene audio disposed after crossfade",
+      "master gain fade out/in",
+      "lights",
+      "music toggle",
+      "parallax",
+      "night lazy-load and round trip",
+      "background pause and resume",
+      "no horizontal overflow",
+      "no console errors"
+    ],
+    "passed": true
+  },
+  {
+    "viewport": "390x844",
+    "checks": [
+      "entry",
+      "audio unlocked",
+      "wave and jump branches, animation lock and idle return",
+      "aligned blink/wave sprite frames",
+      "jump contact shadow",
+      "audible music and ambience signal",
+      "old scene audio disposed after crossfade",
+      "master gain fade out/in",
+      "lights",
+      "music toggle",
+      "parallax",
+      "night lazy-load and round trip",
+      "background pause and resume",
+      "no horizontal overflow",
+      "no console errors"
+    ],
+    "passed": true
+  },
+  {
+    "reducedMotion": true,
+    "passed": true
+  },
+  {
+    "sceneLoadFailureAndRetry": true,
+    "passed": true
+  },
+  {
+    "interactionViewport": "1440x900",
+    "checks": [
+      "discovery persistence",
+      "environment latest-only queue",
+      "user priority",
+      "lookUp sprite",
+      "mushroom glow",
+      "ripples capped at three",
+      "drag rejection on every hotspot",
+      "night greeting",
+      "queue cleared on transition",
+      "mute persistence",
+      "no console errors"
+    ],
+    "passed": true
+  },
+  {
+    "interactionViewport": "390x844",
+    "checks": [
+      "discovery persistence",
+      "environment latest-only queue",
+      "user priority",
+      "lookUp sprite",
+      "mushroom glow",
+      "ripples capped at three",
+      "drag rejection on every hotspot",
+      "night greeting",
+      "queue cleared on transition",
+      "mute persistence",
+      "no console errors"
+    ],
+    "passed": true
+  },
+  {
+    "corePreparationGate": true,
+    "passed": true
+  },
+  {
+    "coreFailureRetry": true,
+    "passed": true
+  },
+  {
+    "optionalFailureStorageAndSensorDenied": true,
+    "passed": true
+  }
+]

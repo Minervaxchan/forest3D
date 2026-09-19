@@ -1,6 +1,6 @@
 import type { SceneConfig } from '../scenes/types';
 
-export type Reaction = 'wave' | 'jump' | 'land' | 'light';
+export type Reaction = 'wave' | 'jump' | 'land' | 'light' | 'mushroom' | 'water';
 type Source = OscillatorNode | AudioBufferSourceNode;
 type Session = {
   bus: GainNode;
@@ -237,12 +237,12 @@ export class ForestAudio {
   react(kind: Reaction) {
     const ctx = this.context;
     if (!ctx || !this.master || ctx.state !== 'running' || document.hidden || this.master.gain.value < .01) return;
-    const notes = kind === 'wave' ? [660, 880] : kind === 'jump' ? [420, 740] : kind === 'land' ? [130] : [1046];
+    const notes = kind === 'wave' ? [660, 880] : kind === 'jump' ? [420, 740] : kind === 'land' ? [130] : kind === 'mushroom' ? [523, 659] : kind === 'water' ? [330, 495] : [1046];
     notes.forEach((frequency, i) => {
       const voice = ctx.createOscillator(), gain = ctx.createGain(), time = ctx.currentTime + i * .12;
       voice.type = 'sine'; voice.frequency.setValueAtTime(frequency, time);
       voice.frequency.exponentialRampToValueAtTime(kind === 'land' ? 70 : frequency * 1.1, time + .12);
-      gain.gain.setValueAtTime(0, time); gain.gain.linearRampToValueAtTime(.045, time + .015);
+      gain.gain.setValueAtTime(0, time); gain.gain.linearRampToValueAtTime(kind === 'water' ? .025 : .045, time + .015);
       gain.gain.exponentialRampToValueAtTime(.0001, time + .25);
       voice.connect(gain).connect(this.master!); voice.start(time); voice.stop(time + .27);
       this.effects.add(voice); voice.onended = () => { this.effects.delete(voice); voice.disconnect(); gain.disconnect(); };

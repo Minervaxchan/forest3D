@@ -20,7 +20,7 @@ export function useParallax(ref:RefObject<HTMLDivElement|null>,enabled:boolean){
     };
     const down=(e:PointerEvent)=>{drag=true;startX=e.clientX;startY=e.clientY;};
     const up=()=>{drag=false;};
-    const leave=()=>{drag=false;targetX=0;targetY=0;};
+    const leave=(e:PointerEvent)=>{if(e.pointerType==='mouse'){drag=false;targetX=0;targetY=0;}};
     const orientation=(e:DeviceOrientationEvent)=>{
       if(drag || performance.now()<touchUntil || e.gamma===null || e.beta===null)return;
       targetX=Math.max(-1,Math.min(1,e.gamma/30));targetY=Math.max(-1,Math.min(1,(e.beta-45)/40));
