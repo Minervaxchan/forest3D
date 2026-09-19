@@ -73,7 +73,12 @@ export async function verifyInteractions(browser, results) {
       const cdp = await context.newCDPSession(page);
       const box = await mushroom.boundingBox(), x = box.x + box.width/2, y = box.y + box.height/2;
       await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});
-      await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x+55,y:y+30}]});
+      // Send a human-paced gesture: one instantaneous move can be coalesced away.
+      for(let step=1;step<=5;step++){
+        await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x+11*step,y:y+6*step}]});
+        await page.waitForTimeout(30);
+      }
+      await page.waitForFunction(()=>Math.abs(Number(document.querySelector('main').style.getPropertyValue('--px')))>.05);
       await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
       assert.equal(await character.getAttribute('data-state'),'idle','real touch drag does not activate mushroom');
       await page.waitForTimeout(250);
