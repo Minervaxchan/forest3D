@@ -1,7 +1,7 @@
 import {chromium} from '@playwright/test';
 import assert from 'node:assert/strict';
 import {mkdir,writeFile} from 'node:fs/promises';
-await mkdir('docs/screenshots',{recursive:true});
+await mkdir('docs/screenshots/v0.2',{recursive:true});
 const browser=await chromium.launch({channel:process.env.BROWSER_CHANNEL||'msedge',headless:true});
 const results=[];
 try{
@@ -16,14 +16,18 @@ for(const mobile of [false,true]){
  await page.addInitScript(()=>{
   window.__contexts=[];
   const Native=window.AudioContext;
-  window.AudioContext=class extends Native{constructor(...args){super(...args);this.__gains=[];window.__contexts.push(this);}createGain(){const gain=super.createGain();this.__gains.push(gain);return gain;}};
+  window.AudioContext=class extends Native{constructor(...args){super(...args);this.__gains=[];this.__loops=new Set();this.__analyser=this.createAnalyser();this.__analyser.fftSize=2048;window.__contexts.push(this);}createGain(){const gain=super.createGain();this.__gains.push(gain);return gain;}createDynamicsCompressor(){const node=super.createDynamicsCompressor();node.connect(this.__analyser);return node;}createBufferSource(){const node=super.createBufferSource();const start=node.start.bind(node),stop=node.stop.bind(node);node.start=(...args)=>{if(node.loop)this.__loops.add(node);return start(...args);};node.stop=(...args)=>{this.__loops.delete(node);return stop(...args);};return node;}};
  });
- await page.goto(process.env.TEST_BASE_URL||'http://localhost:5173',{waitUntil:'networkidle'});
+ await page.goto(process.env.TEST_BASE_URL||'http://localhost:5186',{waitUntil:'networkidle'});
  assert(!requests.some(url=>url.includes('night-reference')), 'night image should be lazy');
- await page.screenshot({path:'docs/screenshots/'+(mobile?'mobile':'desktop')+'-opening.png'});
+ assert.equal(await page.title(), 'forest3D · 林间来信', 'test URL must point to forest3D');
+ await page.screenshot({path:'docs/screenshots/v0.2/'+(mobile?'mobile':'desktop')+'-opening.png'});
  await page.getByRole('button',{name:'点击进入森林'}).click();
  await page.waitForTimeout(1300);
  assert.equal(await page.evaluate(()=>window.__contexts[0].state),'running');
+ assert.equal(await page.evaluate(()=>window.__contexts[0].__loops.size),2,'brook and breeze loops active');
+ const signal=await page.evaluate(()=>{const ctx=window.__contexts[0],data=new Float32Array(2048);ctx.__analyser.getFloatTimeDomainData(data);return Math.sqrt(data.reduce((sum,x)=>sum+x*x,0)/data.length);});
+ assert(signal>.0001,'audio graph must produce an audible signal');
  const character=page.getByRole('button',{name:'和小黄人互动：挥手或跳跃'});
  await character.click();
  const animation=await character.getAttribute('data-state');
@@ -35,9 +39,19 @@ for(const mobile of [false,true]){
  for(const [value,expected] of [[0,'wave'],[.9,'jump']]){
   await page.evaluate(value=>{Math.random=()=>value;},value);
   await character.click();assert.equal(await character.getAttribute('data-state'),expected);
+  if(expected==='wave'){
+   assert.equal(await character.getAttribute('data-pose'),'wave');
+   assert.equal(await page.locator('.pose-wave').evaluate(img=>img.complete&&img.naturalWidth>0),true);
+   await page.screenshot({path:'docs/screenshots/v0.2/'+(mobile?'mobile':'desktop')+'-wave.png'});
+  }else{
+   await page.waitForTimeout(300);
+   const opacity=await page.locator('.character-shadow').evaluate(el=>Number(getComputedStyle(el).opacity));
+   assert(opacity<.7,'jump should soften the ground shadow');
+  }
   await page.waitForTimeout(1600);assert.equal(await character.getAttribute('data-state'),'idle');
  }
- await page.waitForFunction(()=>document.querySelector('.eyelids')?.classList.contains('closed'),{},{timeout:7000});
+ await page.waitForFunction(()=>document.querySelector('.character')?.getAttribute('data-pose') === 'blink',{},{timeout:7000});
+ await page.screenshot({path:'docs/screenshots/v0.2/'+(mobile?'mobile':'desktop')+'-blink.png'});
  const light=page.getByRole('button',{name:'灯串熄灭，灯泡 4'});
  await light.click();
  assert.equal(await page.getByRole('button',{name:'灯串点亮，灯泡 4'}).getAttribute('aria-pressed'),'false');
@@ -46,6 +60,8 @@ for(const mobile of [false,true]){
  assert.equal(await page.getByRole('button',{name:'打开音乐'}).getAttribute('aria-pressed'),'false');
  await page.waitForTimeout(1000);
  assert.equal(await page.evaluate(()=>window.__contexts[0].__gains[0].gain.value),0,'muting should fade master gain to zero');
+ const mutedSignal=await page.evaluate(()=>{const data=new Float32Array(2048);window.__contexts[0].__analyser.getFloatTimeDomainData(data);return Math.max(...data.map(Math.abs));});
+ assert(mutedSignal<.0001,'mute must silence ambience and music together');
  await page.getByRole('button',{name:'打开音乐'}).click();
  await page.waitForTimeout(1000);
  assert.equal(await page.evaluate(()=>window.__contexts[0].__gains[0].gain.value),1,'unmuting should restore gain');
@@ -57,12 +73,13 @@ for(const mobile of [false,true]){
  await page.waitForTimeout(700);
  assert(Math.abs(await page.locator('main').evaluate(el=>Number(el.style.getPropertyValue('--px'))))>.2,'parallax should respond');
  assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no horizontal overflow');
- await page.screenshot({path:'docs/screenshots/'+(mobile?'mobile':'desktop')+'-forest.png'});
+ await page.screenshot({path:'docs/screenshots/v0.2/'+(mobile?'mobile':'desktop')+'-forest.png'});
  await page.getByRole('button',{name:'切换至萤火之森'}).click();
  await page.getByRole('heading',{name:'萤火之森'}).waitFor();
- await page.waitForTimeout(1300);
+ await page.waitForTimeout(1550);
+ assert.equal(await page.evaluate(()=>window.__contexts[0].__loops.size),2,'old scene loops must be released after crossfade');
  assert(requests.some(url=>url.includes('night-reference')));
- await page.screenshot({path:'docs/screenshots/'+(mobile?'mobile':'desktop')+'-night.png'});
+ await page.screenshot({path:'docs/screenshots/v0.2/'+(mobile?'mobile':'desktop')+'-night.png'});
  await page.getByRole('button',{name:'切换至日光森林'}).click();
  await page.getByRole('heading',{name:'日光森林'}).waitFor();
  await page.waitForTimeout(1300);
@@ -73,11 +90,11 @@ for(const mobile of [false,true]){
  await page.waitForTimeout(400);
  assert.equal(await page.evaluate(()=>window.__contexts[0].state),'running');
  assert.deepEqual(errors,[]);
- results.push({viewport:mobile?'390x844':'1440x900',checks:['entry','audio unlocked','wave and jump branches, animation lock and idle return','random blink','master gain fade out/in','lights','music toggle','parallax','night lazy-load and round trip','background pause and resume','no horizontal overflow','no console errors'],passed:true});
+ results.push({viewport:mobile?'390x844':'1440x900',checks:['entry','audio unlocked','wave and jump branches, animation lock and idle return','aligned blink/wave sprite frames','jump contact shadow','audible music and ambience signal','old scene audio disposed after crossfade','master gain fade out/in','lights','music toggle','parallax','night lazy-load and round trip','background pause and resume','no horizontal overflow','no console errors'],passed:true});
  await context.close();
 }
 const page=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'reduce'});
-await page.goto(process.env.TEST_BASE_URL||'http://localhost:5173');
+await page.goto(process.env.TEST_BASE_URL||'http://localhost:5186');
 await page.getByRole('button',{name:'点击进入森林'}).click();
 await page.waitForTimeout(400);
 await page.mouse.move(380,700);
@@ -87,7 +104,7 @@ await page.getByRole('heading',{name:'萤火之森'}).waitFor();
 results.push({reducedMotion:true,passed:true});
 const failurePage=await browser.newPage();
 await failurePage.route('**/night-reference.webp',route=>route.abort());
-await failurePage.goto(process.env.TEST_BASE_URL||'http://localhost:5173');
+await failurePage.goto(process.env.TEST_BASE_URL||'http://localhost:5186');
 await failurePage.getByRole('button',{name:'点击进入森林'}).click();
 await failurePage.waitForTimeout(1300);
 await failurePage.getByRole('button',{name:'切换至萤火之森'}).click();
@@ -98,6 +115,6 @@ await failurePage.unroute('**/night-reference.webp');
 await failurePage.getByRole('button',{name:'切换至萤火之森'}).click();
 await failurePage.getByRole('heading',{name:'萤火之森'}).waitFor();
 results.push({sceneLoadFailureAndRetry:true,passed:true});
-await writeFile('docs/verification.json',JSON.stringify(results,null,2));
+await writeFile('docs/verification-v0.2.json',JSON.stringify(results,null,2));
 console.log(JSON.stringify(results,null,2));
 }finally{await browser.close();}

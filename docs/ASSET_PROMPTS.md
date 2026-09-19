@@ -28,3 +28,17 @@ Create a transparent PNG foreground overlay asset for a cinematic realistic magi
 - 主树与远景目前合并；整角色招呼代替单独手臂挥手。
 - 眨眼是 CSS 眼睑近似，不是单独绘制的角色闭眼图。
 - BGM 为程序合成占位，无外部音乐文件；环境音接口暂未配置。
+
+## V0.2 闭眼帧 → src/assets/character/friend-blink-source.png
+
+内置 imagegen，以 V0.1 运行时角色图作为可见参考，生成后保留原图并压缩为 public/assets/character/friend-blink.webp。
+
+Use case: precise-object-edit. Edit this exact transparent character sprite into a BLINK animation frame. Preserve original yellow plush flame-shaped creature perfectly: head lobes, fur texture, exact silhouette, pink cheeks, tiny black smile, both arms hanging down, short legs, white shoes. Change ONLY the two blue eyes: close both into relaxed curved eyelids with fine dark curved eyelash lines and yellow plush eyelids, naturally integrated into fur. No blue eye area remains visible. Keep same front view, body pose, proportions, centered framing, shoe baseline, lighting and size as reference. 1024x1024 square actual transparent alpha background. No backdrop, no floor, no text. This image must match the idle sprite to swap instantly without body shape shifting.
+
+## V0.2 抬手帧 → src/assets/character/friend-wave-source.png
+
+内置 imagegen，以相同 idle 图为参考；运行时使用 public/assets/character/friend-wave.webp。
+
+Use case: precise-object-edit. Create a raised-hand greeting animation frame of this EXACT transparent yellow plush creature sprite. Preserve its exact three uneven flame-shaped head lobes, big blue oval eyes with white rims and lashes, pink cheeks, small black curved smile, yellow plush texture, front-facing body and white shoes. Change ONLY its arm on the VIEWER'S RIGHT: raise and bend that arm so the little open rounded hand is beside the head, palm facing us, cheerful waving pose. Viewer-left arm stays down. Do not raise both arms. Keep head/torso/eyes/feet geometry and lighting identical to reference, centered torso, full body, same shoe baseline. Square 1024x1024 actual transparent alpha background, no floor, no text. Leave space so raised hand is not cropped. This is an animation sprite frame, not a redesign.
+
+V0.2 已替换上文 V0.1 的 CSS 眼睑和原姿态摇摆方案；依然没有骨骼动画。BGM 与环境声均为程序合成，无外部授权音乐/录音。

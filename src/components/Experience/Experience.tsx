@@ -44,8 +44,8 @@ export function Experience(){
     <div ref={camera} className="camera">
       {scene.layers.filter(l=>l.id!=='foreground').map(layer=><div key={layer.id} className={`scene-layer parallax ${layer.id}`} style={{'--depth':layer.depth,backgroundImage:`url(${layer.src})`} as CSSProperties}/>)}
       <div className="sun-rays" aria-hidden="true"/>
-      <LightString on={state.lights} toggle={()=>setExperience({lights:!state.lights})} active={state.entered&&!state.transitioning}/>
-      <Character scene={scene} active={state.entered&&!state.transitioning}/>
+      <LightString on={state.lights} toggle={()=>{setExperience({lights:!state.lights});audio.react('light');}} active={state.entered&&!state.transitioning}/>
+      <Character scene={scene} active={state.entered&&!state.transitioning} onReact={audio.react}/>
       {scene.layers.filter(l=>l.id==='foreground').map(layer=><div key={layer.id} className="scene-layer parallax foreground" style={{'--depth':layer.depth,backgroundImage:`url(${layer.src})`} as CSSProperties}/>)}
       <Fireflies count={scene.effects.fireflies} mobileCount={scene.effects.mobileFireflies}/>
       <div className="vignette" aria-hidden="true"/>
